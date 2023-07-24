@@ -1,4 +1,4 @@
-//this file contains the original game, without photos, with the guess who questions
+//this file contains the original game, without photos, with randomly generated funfacts
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -32,8 +32,18 @@ let appleY = 5;
 //scores
 let score = 0;
 
+// Variable to track if the game is paused
+let isPaused = false;
+
 // create game loop-to continuously update the screen
 function drawGame() {
+
+  if (isPaused) {
+    // If the game is paused, don't update the game state
+    setTimeout(drawGame, 1000 / speed);
+    return;
+  }
+
   changeSnakePosition();
   // game over logic
   let result = isGameOver();
@@ -254,6 +264,13 @@ function checkCollision() {
 
     // Display the onboarding popup with the employee's information and the chosen question
     displayOnboardingPopup(employee, question, answer);
+
+    // Pause the game
+    isPaused = true;
+    setTimeout(() => {
+      // Resume the game after a certain duration (adjust the duration as needed)
+      isPaused = false;
+    }, 1500); // Pause for 3 seconds (adjust the duration as needed)
   }
 }
 
