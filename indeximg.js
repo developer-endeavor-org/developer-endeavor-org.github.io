@@ -11,9 +11,9 @@ class snakePart {
 }
 
 let speed = 7;
-let tileCount = 15;
+let tileCount = 25;
 
-let tileSize = 20;
+let tileSize = 24;
 let headX = 10;
 let headY = 10;
 
@@ -31,6 +31,8 @@ let appleY = 5;
 
 //scores
 let score = 0;
+
+let selectedEmployee = [];
 
 // Variable to track if the game is paused
 let isPaused = false;
@@ -140,20 +142,35 @@ function changeSnakePosition() {
   headY = headY + yvelocity;
 }
 
+// draw apple
 function drawApple() {
-  const appleImage = new Image();
-  appleImage.src = "logo.png"; // endeavor logo
-
-  // Wait for the image to load
-  appleImage.onload = function () {
-    ctx.drawImage(appleImage, appleX * tileCount, appleY * tileCount, tileSize, tileSize);
-  };
+  // Check if an employee is selected
+  if (selectedEmployee.length === 0) {
+    const appleImage = new Image();
+    appleImage.src = "logo.png"; // default apple image
+    // Wait for the image to load
+    appleImage.onload = function () {
+      ctx.drawImage(appleImage, appleX * tileCount, appleY * tileCount, tileSize, tileSize);
+    };
+  } else {
+    const appleImage = new Image();
+    appleImage.src = selectedEmployee.photoUrl; // selected employee's photo
+    // Wait for the image to load
+    appleImage.onload = function () {
+      ctx.drawImage(appleImage, appleX * tileCount, appleY * tileCount, tileSize, tileSize);
+    };
+  }
 }
 
+
+
 // Display onboarding popup
-function displayOnboardingPopup(employee, question, answer) {
-  const firstName = employee.firstName
-  const lastName = employee.lastName
+function displayOnboardingPopup(employee) {
+  const firstName = employee.firstName;
+  const lastName = employee.lastName;
+  const question = employee.question;
+  const answer = employee.answer;
+
   // Create the popup box element
   const popupBox = document.createElement('div');
   popupBox.classList.add('popup-box');
@@ -173,6 +190,7 @@ function displayOnboardingPopup(employee, question, answer) {
     popupBox.remove();
   }, 3000); // Remove after 3 seconds (adjust the duration as needed)
 }
+
 
 
 // Preload employee photos
@@ -226,7 +244,7 @@ function parseCSV(csvData) {
   
 
 function loadCSVFile() {
-  fetch('tempUR.csv')
+  fetch('tempUR.csv') // choose CSV file here
     .then((response) => response.text())
     .then((csvData) => {
       parseCSV(csvData);
@@ -245,25 +263,11 @@ function checkCollision() {
     tailLength++;
     score++;
 
-    // Get a random employee
-    const employee = getRandomEmployee();
-
-    // Filter out the questions with "NA" answers
-    const availableQuestions = employee.questions.filter((_, index) => employee.answers[index] !== 'NA');
-
-    // If there are no available questions, exit the function
-    if (availableQuestions.length === 0) {
-      return;
-    }
-
-    // Choose a random question from the available ones
-    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
-    const question = availableQuestions[randomIndex];
-    const answerIndex = employee.questions.indexOf(question);
-    const answer = employee.answers[answerIndex];
+    // Get a random employee and store it in the selectedEmployee variable
+    selectedEmployee = selectEmployee();
 
     // Display the onboarding popup with the employee's information and the chosen question
-    displayOnboardingPopup(employee, question, answer);
+    displayOnboardingPopup(selectedEmployee);
 
     // Pause the game
     isPaused = true;
@@ -274,6 +278,33 @@ function checkCollision() {
   }
 }
 
+
+function selectEmployee() {
+      // Get a random employee
+      const employee = getRandomEmployee();
+
+      // Filter out the questions with "NA" answers
+      const availableQuestions = employee.questions.filter((_, index) => employee.answers[index] !== 'NA');
+  
+      // If there are no available questions, exit the function
+      if (availableQuestions.length === 0) {
+        return;
+      }
+  
+      // Choose a random question from the available ones
+      const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+      const question = availableQuestions[randomIndex];
+      const answerIndex = employee.questions.indexOf(question);
+      const answer = employee.answers[answerIndex];
+      let selectedEmployee = {
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        photoUrl: employee.photoUrl,
+        question: question,
+        answer: answer,
+      };
+      return selectedEmployee;
+}
   
 
 // add event listener to our body

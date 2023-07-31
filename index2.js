@@ -11,9 +11,9 @@ class snakePart {
 }
 
 let speed = 7;
-let tileCount = 15;
+let tileCount = 25;
 
-let tileSize = 20;
+let tileSize = canvas.clientWidth / tileCount - 2;
 let headX = 10;
 let headY = 10;
 
@@ -32,18 +32,8 @@ let appleY = 5;
 //scores
 let score = 0;
 
-// Variable to track if the game is paused
-let isPaused = false;
-
 // create game loop-to continuously update the screen
 function drawGame() {
-
-  if (isPaused) {
-    // If the game is paused, don't update the game state
-    setTimeout(drawGame, 1000 / speed);
-    return;
-  }
-
   changeSnakePosition();
   // game over logic
   let result = isGameOver();
@@ -107,7 +97,7 @@ function isGameOver() {
 
 // score function
 function drawScore() {
-  ctx.fillStyle = 'black'; // set our text color to black
+  ctx.fillStyle = 'white'; // set our text color to white
   ctx.font = '10px verdana'; //set font size to 10px of font family verdana
   ctx.fillText('Score: ' + score, canvas.clientWidth - 50, 10); // position our score at the right-hand corner
 }
@@ -210,8 +200,8 @@ function parseCSV(csvData) {
           };
   
           // Extract the questions and answers from the CSV data
-          employee.questions = Object.keys(row).filter((key) => key !== 'first' && key !== 'last' && key !== 'photoUrl');
-          employee.answers = Object.values(row).filter((value, index) => index > 2);
+          employee.questions = Object.keys(row).filter((key) => key !== 'first' && key !== 'last');
+          employee.answers = Object.values(row).filter((value, index) => index > 1);
   
           return employee;
         });
@@ -226,7 +216,7 @@ function parseCSV(csvData) {
   
 
 function loadCSVFile() {
-  fetch('tempUR.csv')
+  fetch('temp.csv')
     .then((response) => response.text())
     .then((csvData) => {
       parseCSV(csvData);
@@ -264,13 +254,6 @@ function checkCollision() {
 
     // Display the onboarding popup with the employee's information and the chosen question
     displayOnboardingPopup(employee, question, answer);
-
-    // Pause the game
-    isPaused = true;
-    setTimeout(() => {
-      // Resume the game after a certain duration (adjust the duration as needed)
-      isPaused = false;
-    }, 1500); // Pause for 3 seconds (adjust the duration as needed)
   }
 }
 
